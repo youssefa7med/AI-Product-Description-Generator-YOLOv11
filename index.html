@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Product Describer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(to right, #e3f2fd, #fce4ec);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 50px 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h1 {
+      color: #1e88e5;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    label {
+      font-weight: 600;
+      margin-top: 15px;
+      display: block;
+      color: #333;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      margin-top: 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 20px;
+      font-size: 16px;
+      transition: border 0.3s;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #1e88e5;
+      box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+    }
+
+    button {
+      background-color: #1e88e5;
+      color: white;
+      border: none;
+      padding: 14px 20px;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 100%;
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 10px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #1565c0;
+    }
+
+    button:disabled {
+      background-color: #90caf9;
+      cursor: not-allowed;
+    }
+
+    .result {
+      margin-top: 30px;
+      text-align: left;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 10px;
+      border-left: 4px solid #1e88e5;
+    }
+
+    audio {
+      margin-top: 20px;
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .loader {
+      text-align: center;
+      padding: 20px;
+      color: #1e88e5;
+      font-weight: 600;
+    }
+
+    .error {
+      color: #d32f2f;
+      padding: 15px;
+      background: #ffebee;
+      border-radius: 8px;
+      border-left: 4px solid #d32f2f;
+    }
+
+    .success {
+      color: #388e3c;
+      padding: 15px;
+      background: #e8f5e9;
+      border-radius: 8px;
+      border-left: 4px solid #388e3c;
+    }
+
+    .description {
+      line-height: 1.6;
+      margin: 15px 0;
+    }
+
+    .category {
+      font-weight: 600;
+      color: #1e88e5;
+    }
+
+    @media (max-width: 480px) {
+      .container {
+        padding: 20px;
+      }
+      
+      body {
+        padding: 20px 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Smart Product Describer</h1>
+    <label for="url">Image URL:</label>
+    <input type="text" id="url" placeholder="Enter product image URL...">
+
+    <label for="name">Product Name (Optional):</label>
+    <input type="text" id="name" placeholder="e.g. Leather Backpack, Smart Watch">
+
+    <label for="lang">Select Language:</label>
+    <select id="lang">
+      <option value="English">English</option>
+      <option value="Arabic">Arabic - العربية</option>
+      <option value="French">French - Français</option>
+      <option value="Spanish">Spanish - Español</option>
+      <option value="German">German - Deutsch</option>
+      <option value="Italian">Italian - Italiano</option>
+      <option value="Portuguese (Portugal)">Portuguese - Português</option>
+      <option value="Russian">Russian - Русский</option>
+      <option value="Chinese (Simplified)">Chinese (Simplified) - 简体中文</option>
+      <option value="Japanese">Japanese - 日本語</option>
+      <option value="Korean">Korean - 한국어</option>
+      <option value="Hindi">Hindi - हिन्दी</option>
+      <option value="Bengali">Bengali - বাংলা</option>
+      <option value="Turkish">Turkish - Türkçe</option>
+      <option value="Dutch">Dutch - Nederlands</option>
+      <option value="Polish">Polish - Polski</option>
+      <option value="Ukrainian">Ukrainian - Українська</option>
+      <option value="Vietnamese">Vietnamese - Tiếng Việt</option>
+      <option value="Thai">Thai - ไทย</option>
+      <option value="Greek">Greek - Ελληνικά</option>
+      <option value="Hebrew">Hebrew - עברית</option>
+      <option value="Swedish">Swedish - Svenska</option>
+      <option value="Norwegian">Norwegian - Norsk</option>
+      <option value="Finnish">Finnish - Suomi</option>
+      <option value="Danish">Danish - Dansk</option>
+      <option value="Romanian">Romanian - Română</option>
+      <option value="Hungarian">Hungarian - Magyar</option>
+      <option value="Czech">Czech - Čeština</option>
+      <option value="Indonesian">Indonesian - Bahasa Indonesia</option>
+      <option value="Malay">Malay - Bahasa Melayu</option>
+      <option value="Filipino">Filipino - Filipino</option>
+    </select>
+
+    <button onclick="submitForm()" id="submitBtn">Generate Description 🔍</button>
+
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    async function submitForm() {
+      const url = document.getElementById('url').value;
+      const name = document.getElementById('name').value;
+      const language = document.getElementById('lang').value;
+      const resultDiv = document.getElementById('result');
+      const submitBtn = document.getElementById('submitBtn');
+
+      // Validate URL
+      if (!url) {
+        resultDiv.innerHTML = `<div class="error">Please enter a valid image URL</div>`;
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = 'Generating...';
+      resultDiv.innerHTML = '<div class="loader"><p>Analyzing image and generating description...</p><p>This may take a few moments ⏳</p></div>';
+
+      try {
+        const res = await fetch('http://localhost:8000/product/url/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ url, name, language })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || 'Failed to generate description. Please try again.');
+        }
+
+        resultDiv.innerHTML = `
+          <div class="success">
+            <p><span class="category">Category:</span> ${data.category}</p>
+            <p><span class="category">Description:</span></p>
+            <div class="description">${data.description}</div>
+            <audio controls preload="auto" oncanplaythrough="this.play()">
+              <source src="http://localhost:8000${data.audio_path}" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </div>
+        `;
+      } catch (err) {
+        resultDiv.innerHTML = `<div class="error">❌ ${err.message}</div>`;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = 'Generate Description 🔍';
+      }
+    }
+
+    // Allow form submission with Enter key
+    document.getElementById('url').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        submitForm();
+      }
+    });
+    
+    document.getElementById('name').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        submitForm();
+      }
+    });
+  </script>
+</body>
+</html>
